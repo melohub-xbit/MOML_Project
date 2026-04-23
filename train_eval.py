@@ -38,6 +38,7 @@ import random
 import numpy as np
 import torch
 import torch.nn as nn
+from tqdm.auto import tqdm
 
 from data_loader import get_dataloaders, get_dataset_info, DEVICE, DEFAULT_TRAIN_SUBSET
 from models import build_model, count_parameters
@@ -88,7 +89,8 @@ def _train_model(
     model.train()
 
     for epoch in range(num_epochs):
-        for images, labels in train_loader:
+        batch_iter = tqdm(train_loader, desc=f"Epoch {epoch+1:02d}/{num_epochs:02d}", leave=True)
+        for images, labels in batch_iter:
             images, labels = images.to(DEVICE), labels.to(DEVICE)
 
             optimizer.zero_grad()
@@ -96,6 +98,8 @@ def _train_model(
             loss = criterion(outputs, labels)
             loss.backward()
             optimizer.step()
+            
+            batch_iter.set_postfix({"loss": f"{loss.item():.4f}"})
 
 
 # ---------------------------------------------------------------------------
@@ -113,7 +117,7 @@ def _evaluate_accuracy(
     total = 0
 
     with torch.no_grad():
-        for images, labels in test_loader:
+        for images, labels in tqdm(test_loader, desc="Evaluating", leave=True):
             images, labels = images.to(DEVICE), labels.to(DEVICE)
             outputs = model(images)
             _, predicted = outputs.max(1)
