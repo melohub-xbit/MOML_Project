@@ -1,0 +1,12 @@
+{
+  "study_dir": "results\\optuna\\fashion_mnist\\optuna_nsga2_fashion_mnist_20260424_173928",
+  "reference_point": {
+    "accuracy": 0.0,
+    "inference_ms": 1000.0,
+    "param_count": 10000000.0
+  },
+  "n_trials": 100,
+  "n_pareto_points": 30,
+  "hypervolume": 9096255108.819237,
+  "spacing": 0.10962562239672557
+}

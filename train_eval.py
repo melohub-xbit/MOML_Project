@@ -83,13 +83,22 @@ def _train_model(
     train_loader: torch.utils.data.DataLoader,
     optimizer: torch.optim.Optimizer,
     num_epochs: int,
+    show_progress: bool = True,
 ):
     """Train the model in-place. No return value."""
     criterion = nn.CrossEntropyLoss()
     model.train()
 
     for epoch in range(num_epochs):
-        batch_iter = tqdm(train_loader, desc=f"Epoch {epoch+1:02d}/{num_epochs:02d}", leave=True)
+        batch_iter = train_loader
+        if show_progress:
+            batch_iter = tqdm(
+                train_loader,
+                desc=f"Epoch {epoch+1:02d}/{num_epochs:02d}",
+                leave=False,
+                dynamic_ncols=True,
+                mininterval=0.5,
+            )
         for images, labels in batch_iter:
             images, labels = images.to(DEVICE), labels.to(DEVICE)
 
@@ -98,8 +107,9 @@ def _train_model(
             loss = criterion(outputs, labels)
             loss.backward()
             optimizer.step()
-            
-            batch_iter.set_postfix({"loss": f"{loss.item():.4f}"})
+
+            if show_progress:
+                batch_iter.set_postfix({"loss": f"{loss.item():.4f}"})
 
 
 # ---------------------------------------------------------------------------
@@ -110,14 +120,25 @@ def _train_model(
 def _evaluate_accuracy(
     model: nn.Module,
     test_loader: torch.utils.data.DataLoader,
+    show_progress: bool = True,
 ) -> float:
     """Compute top-1 accuracy on the test set. Returns float in [0, 1]."""
     model.eval()
     correct = 0
     total = 0
 
+    eval_iter = test_loader
+    if show_progress:
+        eval_iter = tqdm(
+            test_loader,
+            desc="Evaluating",
+            leave=False,
+            dynamic_ncols=True,
+            mininterval=0.5,
+        )
+
     with torch.no_grad():
-        for images, labels in tqdm(test_loader, desc="Evaluating", leave=True):
+        for images, labels in eval_iter:
             images, labels = images.to(DEVICE), labels.to(DEVICE)
             outputs = model(images)
             _, predicted = outputs.max(1)
@@ -176,6 +197,7 @@ def train_and_evaluate(
     dataset_name: str,
     seed: int = 42,
     train_subset_size: int | str = "auto",
+    show_progress: bool = True,
     num_workers: int = 2,
 ) -> dict:
     """Full MOO trial: build model, train, evaluate all 3 objectives.
@@ -200,9 +222,6 @@ def train_and_evaluate(
         Random seed for this trial. For MOO loops, use base_seed + trial_number.
     train_subset_size : int or "auto"
         Training subset size. "auto" = 20K (GPU) / 10K (CPU).
-    num_workers : int
-        Number of DataLoader workers. Use 0 in notebooks on Windows to avoid
-        multiprocessing issues.
 
     Returns
     -------
@@ -244,10 +263,16 @@ def train_and_evaluate(
     optimizer = _build_optimizer(model, config["optimizer_type"], config["learning_rate"])
 
     # ---- Train -----------------------------------------------------------
-    _train_model(model, train_loader, optimizer, config["num_epochs"])
+    _train_model(
+        model,
+        train_loader,
+        optimizer,
+        config["num_epochs"],
+        show_progress=show_progress,
+    )
 
     # ---- Evaluate objectives ---------------------------------------------
-    accuracy = _evaluate_accuracy(model, test_loader)
+    accuracy = _evaluate_accuracy(model, test_loader, show_progress=show_progress)
 
     inference_ms = _measure_inference_time(
         model,
