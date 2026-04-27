@@ -222,6 +222,11 @@ def train_and_evaluate(
         Random seed for this trial. For MOO loops, use base_seed + trial_number.
     train_subset_size : int or "auto"
         Training subset size. "auto" = 20K (GPU) / 10K (CPU).
+    show_progress : bool
+        If True, show tqdm progress bars during train/eval loops.
+    num_workers : int
+        Number of DataLoader workers. Use 0 in notebooks on Windows to avoid
+        multiprocessing issues.
 
     Returns
     -------
