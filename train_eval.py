@@ -176,6 +176,7 @@ def train_and_evaluate(
     dataset_name: str,
     seed: int = 42,
     train_subset_size: int | str = "auto",
+    num_workers: int = 2,
 ) -> dict:
     """Full MOO trial: build model, train, evaluate all 3 objectives.
 
@@ -199,6 +200,9 @@ def train_and_evaluate(
         Random seed for this trial. For MOO loops, use base_seed + trial_number.
     train_subset_size : int or "auto"
         Training subset size. "auto" = 20K (GPU) / 10K (CPU).
+    num_workers : int
+        Number of DataLoader workers. Use 0 in notebooks on Windows to avoid
+        multiprocessing issues.
 
     Returns
     -------
@@ -233,6 +237,7 @@ def train_and_evaluate(
         train_subset_size=train_subset_size,
         input_resolution=config["input_resolution"],
         seed=seed,
+        num_workers=num_workers,
     )
 
     # ---- Build optimizer -------------------------------------------------
