@@ -4,5 +4,7 @@ __pycache__/
 data/
 .env
 
+report.tex
+
 MoML_Project_Description.pdf
 
