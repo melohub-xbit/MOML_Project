@@ -1,0 +1,5 @@
+label,trial_number,accuracy,inference_ms,param_count,arch_type,num_conv_layers,num_channels,num_fc_units,learning_rate,batch_size,num_epochs,dropout_rate,optimizer_type,input_resolution
+fast,17,0.6569,0.2168,2538,plain,1,8,128,0.01,16,10,0.24559312011289544,Adam,16
+small,17,0.6569,0.2168,2538,plain,1,8,128,0.01,16,10,0.24559312011289544,Adam,16
+accurate,37,0.8739,1.6195,258762,plain,4,32,128,0.01,64,5,0.26288889491128187,SGD,28
+balanced,16,0.8527,0.5142,20826,plain,4,8,128,0.01,16,7,0.24436938426036672,SGD,16

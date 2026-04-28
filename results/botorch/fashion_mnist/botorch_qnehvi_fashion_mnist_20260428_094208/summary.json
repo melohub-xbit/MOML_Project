@@ -1,0 +1,32 @@
+{
+  "study_name": "botorch_qnehvi_fashion_mnist_20260428_094208",
+  "framework": "botorch",
+  "algorithm": "qNEHVI",
+  "dataset_name": "fashion_mnist",
+  "device": "cuda",
+  "n_trials_completed": 80,
+  "n_pareto_points": 21,
+  "n_init": 16,
+  "n_bo": 64,
+  "train_subset_size": 8000,
+  "seed": 42,
+  "num_workers": 2,
+  "num_restarts": 3,
+  "raw_samples": 64,
+  "mc_samples": 16,
+  "elapsed_seconds": 6164.7220158576965,
+  "objective_names": [
+    "accuracy",
+    "inference_ms",
+    "param_count"
+  ],
+  "objective_directions": [
+    "maximize",
+    "minimize",
+    "minimize"
+  ],
+  "artifacts": {
+    "trials_csv": "D:\\forKrishna\\MOML\\results\\botorch\\fashion_mnist\\botorch_qnehvi_fashion_mnist_20260428_094208\\trials.csv",
+    "pareto_csv": "D:\\forKrishna\\MOML\\results\\botorch\\fashion_mnist\\botorch_qnehvi_fashion_mnist_20260428_094208\\pareto_front.csv"
+  }
+}

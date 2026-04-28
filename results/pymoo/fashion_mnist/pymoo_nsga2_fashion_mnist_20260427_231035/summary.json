@@ -1,0 +1,29 @@
+{
+  "study_name": "pymoo_nsga2_fashion_mnist_20260427_231035",
+  "framework": "pymoo",
+  "algorithm": "NSGA2",
+  "dataset_name": "fashion_mnist",
+  "device": "cuda",
+  "n_trials_completed": 80,
+  "n_pareto_points": 18,
+  "pop_size": 20,
+  "n_gen": 4,
+  "train_subset_size": 8000,
+  "seed": 42,
+  "num_workers": 2,
+  "elapsed_seconds": 4726.559081315994,
+  "objective_names": [
+    "accuracy",
+    "inference_ms",
+    "param_count"
+  ],
+  "objective_directions": [
+    "maximize",
+    "minimize",
+    "minimize"
+  ],
+  "artifacts": {
+    "trials_csv": "D:\\forKrishna\\MOML\\results\\pymoo\\fashion_mnist\\pymoo_nsga2_fashion_mnist_20260427_231035\\trials.csv",
+    "pareto_csv": "D:\\forKrishna\\MOML\\results\\pymoo\\fashion_mnist\\pymoo_nsga2_fashion_mnist_20260427_231035\\pareto_front.csv"
+  }
+}

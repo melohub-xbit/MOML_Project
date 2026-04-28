@@ -17,8 +17,8 @@ Outputs (written into --study-dir):
     pareto_table.csv          (>=4 representative Pareto points)
     appendix_solution.json    (one fully-detailed Pareto-optimal config)
     plot_2d_panels.png
-    plot_parallel_coords.png
     plot_3d_scatter.png
+    plot_3d_pareto.png
 """
 
 from __future__ import annotations
@@ -315,78 +315,6 @@ def _plot_2d_panels(
     )
 
     fig.suptitle(title, fontsize=12.5, y=1.02)
-    plt.tight_layout()
-    plt.savefig(out_path, dpi=160, bbox_inches="tight", facecolor="white")
-    plt.close(fig)
-
-
-def _plot_parallel_coords(
-    pareto_rows: list[dict[str, Any]],
-    picks: dict[str, dict[str, Any]],
-    out_path: Path,
-    title: str,
-) -> None:
-    if not pareto_rows:
-        return
-    pts = _objective_matrix(pareto_rows)
-    pts_min = _to_minimization_space(pts)  # [error_rate, ms, params]
-    mins = pts_min.min(axis=0)
-    maxs = pts_min.max(axis=0)
-    denom = np.where((maxs - mins) < 1e-12, 1.0, (maxs - mins))
-    norm = (pts_min - mins) / denom
-
-    fig, ax = plt.subplots(figsize=(10, 5.6))
-    xs = np.array([0, 1, 2])
-    pick_ids = {id(picks[k]): k for k in picks} if picks else {}
-
-    # Background: full Pareto front in faint gray
-    for i, r in enumerate(pareto_rows):
-        if id(r) in pick_ids:
-            continue
-        ax.plot(xs, norm[i], color="#7f8c8d", alpha=0.30, linewidth=1.0, zorder=1)
-
-    # Highlighted picks: bold colored lines + dots + end-of-line labels
-    label_y_used: list[float] = []
-    for i, r in enumerate(pareto_rows):
-        if id(r) not in pick_ids:
-            continue
-        label = pick_ids[id(r)]
-        ax.plot(xs, norm[i], color=PICK_COLORS[label], linewidth=2.6,
-                alpha=0.95, zorder=3)
-        ax.scatter(xs, norm[i], color=PICK_COLORS[label], s=70,
-                   edgecolors="black", linewidths=0.8, zorder=4)
-        # Place label at the right edge with simple anti-collision spacing
-        y = float(norm[i][-1])
-        for prev in label_y_used:
-            if abs(prev - y) < 0.05:
-                y = prev + 0.06
-        label_y_used.append(y)
-        ax.text(xs[-1] + 0.08, y, label, color=PICK_COLORS[label],
-                fontweight="bold", va="center", fontsize=10)
-
-    # Vertical axes lines
-    for x in xs:
-        ax.axvline(x, color="#34495e", alpha=0.5, linewidth=1.0, zorder=0)
-
-    # X-axis ticks include the actual value range
-    accs = pts[:, 0]
-    ax.set_xticks(xs)
-    ax.set_xticklabels(
-        [
-            f"error rate (1−acc)\n[{1 - accs.max():.3f},  {1 - accs.min():.3f}]",
-            f"inference (ms)\n[{pts[:, 1].min():.2f},  {pts[:, 1].max():.2f}]",
-            f"parameters\n[{int(pts[:, 2].min()):,},  {int(pts[:, 2].max()):,}]",
-        ],
-        fontsize=9,
-    )
-    ax.set_xlim(-0.15, 2.45)
-    ax.set_ylabel("Normalized objective (lower = better)")
-    ax.set_ylim(-0.05, 1.05)
-    ax.grid(True, axis="y", alpha=0.25, linestyle="--")
-    ax.set_title(
-        f"{title}\nGray = full Pareto front  ·  colored = representative picks",
-        fontsize=11,
-    )
     plt.tight_layout()
     plt.savefig(out_path, dpi=160, bbox_inches="tight", facecolor="white")
     plt.close(fig)
@@ -709,7 +637,6 @@ def analyze(study_dir: Path, compare_pareto_path: Path | None = None) -> dict[st
             pass
     title = f"{framework_label}  |  n_trials={len(rows)}  |  n_pareto={len(pareto_rows_all)}"
     _plot_2d_panels(rows, pareto_rows_all, compare_rows, picks, study_dir / "plot_2d_panels.png", title)
-    _plot_parallel_coords(pareto_rows_all, picks, study_dir / "plot_parallel_coords.png", title)
     _plot_3d_scatter(rows, pareto_rows_all, compare_rows, picks, study_dir / "plot_3d_scatter.png", title)
     _plot_3d_pareto(rows, pareto_rows_all, compare_rows, picks, study_dir / "plot_3d_pareto.png", title)
 

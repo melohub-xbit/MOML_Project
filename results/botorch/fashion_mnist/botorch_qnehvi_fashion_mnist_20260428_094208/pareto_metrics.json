@@ -1,0 +1,28 @@
+{
+  "study_dir": "D:\\forKrishna\\MOML\\results\\botorch\\fashion_mnist\\botorch_qnehvi_fashion_mnist_20260428_094208",
+  "n_trials": 80,
+  "n_pareto_points": 21,
+  "reference_point": {
+    "accuracy": 0.0,
+    "inference_ms": 1000.0,
+    "param_count": 10000000.0
+  },
+  "hypervolume": 8731592649.508646,
+  "spacing": 0.16996677966911292,
+  "extremes": {
+    "accuracy_max": 0.8739,
+    "inference_ms_min": 0.216818,
+    "param_count_min": 2538
+  },
+  "comparison": {
+    "compare_pareto_csv": "D:\\forKrishna\\MOML\\results\\pymoo\\fashion_mnist\\pymoo_nsga2_fashion_mnist_20260427_231035\\pareto_front.csv",
+    "compare_n_pareto": 18,
+    "joint_n_pareto": 25,
+    "ours_surviving_in_joint": 19,
+    "other_surviving_in_joint": 6,
+    "gd_ours_to_joint": 0.06692077828935089,
+    "gd_other_to_joint": 0.06668453445583682
+  },
+  "pareto_table_csv": "D:\\forKrishna\\MOML\\results\\botorch\\fashion_mnist\\botorch_qnehvi_fashion_mnist_20260428_094208\\pareto_table.csv",
+  "appendix_json": "D:\\forKrishna\\MOML\\results\\botorch\\fashion_mnist\\botorch_qnehvi_fashion_mnist_20260428_094208\\appendix_solution.json"
+}

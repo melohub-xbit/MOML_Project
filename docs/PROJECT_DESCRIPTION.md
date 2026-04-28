@@ -101,13 +101,13 @@ Total wall-clock budget: < 2 hours per framework
 - `moo_botorch.py` — BoTorch qNEHVI MOO loop
 - `moo_optuna.py` — Optuna NSGA-II MOO loop
 - `pareto_analysis.py` — Pareto front extraction, hypervolume, spacing metric
-- `visualize.py` — 2D/3D scatter plots, parallel coordinates
+- `analyze_study.py` — Pareto front extraction, metrics, plots
 - `requirements.txt`, `README.md`
 
 ### Report (max 6 pages)
 1. **Quantitative Analysis**
-   - 2D/3D Pareto front scatter plots (O1 vs O2, O1 vs O3, O2 vs O3)
-   - Parallel coordinates plot across all 3 objectives
+   - 2D pairwise Pareto scatter plots (O1 vs O2, O1 vs O3, O2 vs O3)
+   - 3D Pareto-front scatter (all-minimize bowl orientation)
    - Hypervolume indicator (with defined reference point)
    - Spacing metric
    - Generational distance (BoTorch vs Optuna comparison)

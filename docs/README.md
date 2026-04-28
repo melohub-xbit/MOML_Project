@@ -65,12 +65,12 @@ MOML/
 │   └── FashionMNIST/raw/        #   Fashion-MNIST IDX files
 │
 ├── data_loader.py               # Dataset loading, transforms, CUDA-aware subsets
-├── models.py                    # 3 CNN architectures (Plain, Residual, DepthSep)
+├── models.py                    # PlainCNN architecture
 ├── train_eval.py                # Training loop + 3-objective evaluation
-├── moo_optuna.py                # [TODO] Optuna NSGA-II optimization loop
-├── moo_botorch.py               # [TODO] BoTorch qNEHVI optimization loop
-├── pareto_analysis.py           # [TODO] Pareto front, hypervolume, spacing metrics
-├── visualize.py                 # [TODO] 2D/3D scatter, parallel coordinates plots
+├── moo_pymoo.py                 # pymoo NSGA-II optimization loop
+├── moo_botorch.py               # BoTorch qNEHVI optimization loop
+├── pareto_analysis.py           # Pareto front, hypervolume, spacing metrics
+├── analyze_study.py             # 2D pairwise scatter, 2D bubble, 3D Pareto plots
 │
 ├── results/                     # [Auto-created] Trial logs and Pareto fronts
 ├── PROJECT_DESCRIPTION.md       # Full assignment specification
