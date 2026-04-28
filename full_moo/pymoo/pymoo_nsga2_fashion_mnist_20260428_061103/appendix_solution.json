@@ -1,0 +1,22 @@
+{
+  "label": "balanced (closest-to-ideal Pareto point)",
+  "objectives": {
+    "accuracy": 0.8654,
+    "inference_ms": 0.228021,
+    "param_count": 15914
+  },
+  "decision_variables": {
+    "arch_type": "plain",
+    "num_conv_layers": "2",
+    "num_channels": "16",
+    "num_fc_units": "256",
+    "learning_rate": "0.0056129509859034945",
+    "batch_size": "64",
+    "num_epochs": "8",
+    "dropout_rate": "0.4764496975348725",
+    "optimizer_type": "Adam",
+    "input_resolution": "16"
+  },
+  "trial_number": "64",
+  "seed": "106"
+}

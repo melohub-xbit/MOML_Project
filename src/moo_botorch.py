@@ -82,10 +82,10 @@ class SearchSpace:
         self.arch_type = ["plain"]
         self.num_conv_layers = [1, 2, 4]
         self.num_channels = [8, 16, 32]
-        self.num_fc_units = [128]
+        self.num_fc_units = [64,128,256]
         # learning_rate: continuous, log-scale in [1e-5, 1e-2]
         # batch_size: categorical {16, 64}
-        self.batch_size = [16, 64]
+        self.batch_size = [64,128,256]
         # num_epochs: integer in [5, 10]
         # dropout_rate: continuous in [0.0, 0.5]
         self.optimizer_type = ["SGD", "Adam"]
@@ -339,7 +339,9 @@ def run_botorch_study(
         )
         print(
             f"  trial {i:03d} | acc={raw['accuracy']:.4f} | ms={raw['inference_ms']:7.3f} | "
-            f"params={int(raw['param_count']):>9,} | {elapsed:5.1f}s | init"
+            f"params={int(raw['param_count']):>9,} | {elapsed:5.1f}s | init | "
+            f"{cfg['arch_type']}/{cfg['num_conv_layers']}L/{cfg['num_channels']}ch/"
+            f"{cfg['num_fc_units']}fc/bs{cfg['batch_size']}"
         )
 
     y_all = torch.stack(y_list, dim=0)
@@ -427,7 +429,9 @@ def run_botorch_study(
         print(
             f"  trial {trial_id:03d} | acc={raw['accuracy']:.4f} | ms={raw['inference_ms']:7.3f} | "
             f"params={int(raw['param_count']):>9,} | {elapsed:5.1f}s | bo "
-            f"({(time.time()-t0)/60:.1f}m total)"
+            f"({(time.time()-t0)/60:.1f}m total) | "
+            f"{cfg['arch_type']}/{cfg['num_conv_layers']}L/{cfg['num_channels']}ch/"
+            f"{cfg['num_fc_units']}fc/bs{cfg['batch_size']}"
         )
 
     elapsed_total = time.time() - t0

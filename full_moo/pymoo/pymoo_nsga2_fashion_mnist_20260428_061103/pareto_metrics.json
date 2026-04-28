@@ -1,0 +1,19 @@
+{
+  "study_dir": "D:\\forKrishna\\MOML\\full_moo\\pymoo\\pymoo_nsga2_fashion_mnist_20260428_061103",
+  "n_trials": 200,
+  "n_pareto_points": 48,
+  "reference_point": {
+    "accuracy": 0.0,
+    "inference_ms": 1000.0,
+    "param_count": 10000000.0
+  },
+  "hypervolume": 9212041817.458042,
+  "spacing": 0.06248709076953301,
+  "extremes": {
+    "accuracy_max": 0.9218,
+    "inference_ms_min": 0.122421,
+    "param_count_min": 1322
+  },
+  "pareto_table_csv": "D:\\forKrishna\\MOML\\full_moo\\pymoo\\pymoo_nsga2_fashion_mnist_20260428_061103\\pareto_table.csv",
+  "appendix_json": "D:\\forKrishna\\MOML\\full_moo\\pymoo\\pymoo_nsga2_fashion_mnist_20260428_061103\\appendix_solution.json"
+}

@@ -77,9 +77,9 @@ def make_search_space() -> dict:
         "arch_type": Choice(options=["plain"]),
         "num_conv_layers": Choice(options=[1, 2, 4]),
         "num_channels": Choice(options=[8, 16, 32]),
-        "num_fc_units": Choice(options=[128]),
+        "num_fc_units": Choice(options=[64,128,256]),
         "learning_rate": Real(bounds=(1e-5, 1e-2)),
-        "batch_size": Choice(options=[16, 64]),
+        "batch_size": Choice(options=[64,128,256]),
         "num_epochs": Integer(bounds=(5, 10)),
         "dropout_rate": Real(bounds=(0.0, 0.5)),
         "optimizer_type": Choice(options=["SGD", "Adam"]),
@@ -192,7 +192,8 @@ class ImageClsProblem(ElementwiseProblem):
         print(
             f"  trial {trial_number:03d} | acc={acc:.4f} | ms={ms:7.3f} | "
             f"params={int(params):>9,} | {elapsed:5.1f}s | "
-            f"{cfg['arch_type']}/{cfg['num_conv_layers']}L/{cfg['num_channels']}ch"
+            f"{cfg['arch_type']}/{cfg['num_conv_layers']}L/{cfg['num_channels']}ch/"
+            f"{cfg['num_fc_units']}fc/bs{cfg['batch_size']}"
         )
 
 
