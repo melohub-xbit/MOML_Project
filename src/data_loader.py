@@ -19,6 +19,8 @@ Usage:
     )
 """
 
+from pathlib import Path
+
 import torch
 import numpy as np
 from torch.utils.data import DataLoader, Subset
@@ -28,7 +30,9 @@ from torchvision import datasets, transforms
 # Constants & Device Detection
 # ---------------------------------------------------------------------------
 
-DATA_ROOT = "./data"
+# Resolve project root from this file's location: src/data_loader.py -> parent.parent
+PROJECT_ROOT = Path(__file__).resolve().parent.parent
+DATA_ROOT = str(PROJECT_ROOT / "data")
 
 # Auto-detect CUDA. Used by all project modules for consistent device placement.
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
