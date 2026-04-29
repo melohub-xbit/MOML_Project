@@ -1,23 +1,4 @@
-"""
-models.py -- CNN architecture for multi-objective optimization.
 
-Single architecture family (PlainCNN). Stack of Conv -> BN -> ReLU -> MaxPool
-blocks followed by an FC head. Parameterized by the search-space variables.
-
-Usage:
-    from models import build_model
-
-    model = build_model(
-        arch_type="plain",
-        input_channels=3,
-        input_resolution=32,
-        num_classes=10,
-        num_conv_layers=3,
-        num_channels=64,
-        num_fc_units=128,
-        dropout_rate=0.3,
-    )
-"""
 
 import torch
 import torch.nn as nn
@@ -29,7 +10,6 @@ import torch.nn as nn
 
 
 class ConvBlock(nn.Module):
-    """Standard Conv -> BatchNorm -> ReLU block."""
 
     def __init__(self, in_ch: int, out_ch: int, kernel_size: int = 3):
         super().__init__()
@@ -47,7 +27,6 @@ class ConvBlock(nn.Module):
 
 
 class PlainCNN(nn.Module):
-    """Stack of ConvBlock layers with MaxPool, followed by FC head."""
 
     def __init__(
         self,
@@ -108,32 +87,7 @@ def build_model(
     num_fc_units: int,
     dropout_rate: float,
 ) -> nn.Module:
-    """Construct a CNN from the search-space configuration.
-
-    Parameters
-    ----------
-    arch_type : str
-        Currently only ``"plain"`` is supported.
-    input_channels : int
-        1 for Fashion-MNIST (grayscale), 3 for CIFAR-10 (RGB).
-    input_resolution : int
-        Spatial size of input images (e.g. 16 or 32).
-    num_classes : int
-        Number of output classes (10 for both datasets).
-    num_conv_layers : int
-        Number of convolutional blocks. Search range: [1, 4].
-    num_channels : int
-        Base channel width. Doubles at each layer (up to 3rd).
-    num_fc_units : int
-        Width of the FC hidden layer.
-    dropout_rate : float
-        Dropout probability before the final classifier.
-
-    Returns
-    -------
-    nn.Module
-        The constructed CNN, ready for .to(device) and training.
-    """
+    
     if arch_type not in _ARCH_REGISTRY:
         raise ValueError(
             f"Unknown arch_type: {arch_type!r}. Supported: {list(_ARCH_REGISTRY)}"
@@ -151,7 +105,6 @@ def build_model(
 
 
 def count_parameters(model: nn.Module) -> int:
-    """Return total number of trainable parameters."""
     return sum(p.numel() for p in model.parameters() if p.requires_grad)
 
 

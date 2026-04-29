@@ -1,25 +1,4 @@
-"""
-analyze_study.py -- Framework-agnostic post-hoc analysis for an MOO study.
 
-Works on any study dir written by moo_pymoo.py or moo_botorch.py: both write
-the same trials.csv schema (accuracy, inference_ms, param_count + 10 search
-space keys) and the same study_dir layout.
-
-Inputs:
-    --study-dir : study dir containing trials.csv. The non-dominated set is
-                  recomputed from trials.csv so all trials contribute.
-    --compare   : optional path to another framework's pareto_front.csv for
-                  side-by-side plotting and generational-distance vs the
-                  joint reference front (e.g. pymoo vs botorch comparison).
-
-Outputs (written into --study-dir):
-    pareto_metrics.json
-    pareto_table.csv          (>=4 representative Pareto points)
-    appendix_solution.json    (one fully-detailed Pareto-optimal config)
-    plot_2d_panels.png
-    plot_3d_scatter.png
-    plot_3d_pareto.png
-"""
 
 from __future__ import annotations
 
@@ -89,7 +68,6 @@ def _objective_matrix(rows: list[dict[str, Any]]) -> np.ndarray:
 
 
 def _pareto_rows(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
-    """Recompute the non-dominated set from all observed trials."""
     pts = _objective_matrix(rows)
     front = pareto_front(pts)
     front_set = {tuple(p) for p in front}
@@ -97,8 +75,6 @@ def _pareto_rows(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
 
 
 def _representative_picks(pareto_rows: list[dict[str, Any]]) -> dict[str, dict[str, Any]]:
-    """Pick the canonical 4 Pareto points the report needs:
-    fast (min ms), small (min params), accurate (max acc), balanced (closest to ideal)."""
     if not pareto_rows:
         return {}
 
@@ -153,13 +129,7 @@ def _write_pareto_table(picks: dict[str, dict[str, Any]], out_path: Path) -> Non
 def _pareto_2d_indices(
     xs: list[float], ys: list[float], x_min: bool = True, y_min: bool = True
 ) -> list[int]:
-    """Indices of 2D non-dominated points in the projection of a 3D Pareto set.
-
-    A 3D-Pareto point can be 2D-dominated when projecting to two of the three
-    objectives, so we recompute non-domination per panel before drawing the
-    staircase line (otherwise the connecting line zig-zags through dominated
-    points and looks wrong).
-    """
+    
     n = len(xs)
     keep: list[int] = []
     for i in range(n):
@@ -328,15 +298,7 @@ def _plot_3d_pareto(
     out_path: Path,
     title: str,
 ) -> None:
-    """Classic 3D Pareto-front scatter (MATLAB-style) — three labeled objective
-    axes, all in minimization orientation so the front forms the canonical
-    'bowl' near the origin.
-
-    Inference time and parameter count span orders of magnitude on this problem,
-    so we plot ``log10(value)`` for those two axes (mpl3d's native ``set_yscale
-    ('log')`` is buggy in 3D — it leaves tick labels stacked on top of each
-    other) and reformat the ticks back to physical units.
-    """
+    
     from mpl_toolkits.mplot3d import Axes3D  # noqa: F401  (registers projection)
     from matplotlib.ticker import FuncFormatter
 
@@ -433,12 +395,6 @@ def _plot_3d_scatter(
     out_path: Path,
     title: str,
 ) -> None:
-    """3 objectives in 2D: x=ms, y=accuracy, marker size + viridis color = params.
-
-    A standard 3-objective Pareto visualization (replaces the old hard-to-read
-    3D rotation). Filename retained so existing notebook display cells still
-    point at the right PNG.
-    """
     fig, ax = plt.subplots(figsize=(11, 6.6))
 
     all_params = np.array([r["param_count"] for r in all_rows], dtype=float)

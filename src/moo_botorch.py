@@ -1,28 +1,4 @@
-"""
-moo_botorch.py -- BoTorch qNEHVI multi-objective optimization for MOML project.
 
-3 objectives (same as moo_pymoo.py for direct head-to-head comparison):
-    O1: Maximize accuracy
-    O2: Minimize inference_ms (CPU, batch=1)
-    O3: Minimize param_count
-
-BoTorch maximizes everything internally, so accuracy is fed as +acc, inference
-and param_count are negated. The output CSVs are restored to project sign
-conventions (accuracy maximize, ms/params minimize).
-
-Decision space mirrors moo_pymoo.make_search_space() exactly: same fixed dims
-(arch_type='plain', num_fc_units=128), same discrete sets and continuous
-ranges. The 10-dim unit-cube encoding decodes back to the same dict schema
-that train_and_evaluate consumes.
-
-Output layout matches moo_pymoo.run_pymoo_study so analyze_study.py works on
-both frameworks without changes:
-
-    results/botorch/<dataset>/botorch_qnehvi_<dataset>_<ts>/
-        trials.csv          (one row per evaluated trial, streamed)
-        pareto_front.csv    (final non-dominated set)
-        summary.json
-"""
 
 from __future__ import annotations
 
@@ -71,12 +47,7 @@ SEARCH_SPACE_KEYS = [
 
 
 class SearchSpace:
-    """10-D unit-cube encoded search space matching moo_pymoo.
-
-    Each dim is decoded to a Python type compatible with train_and_evaluate.
-    Single-option fields (arch_type, num_fc_units) are kept as dims so the GP
-    sees the full encoded space; they always decode to the same value.
-    """
+    
 
     def __init__(self) -> None:
         self.arch_type = ["plain"]
@@ -145,12 +116,7 @@ def _config_key(cfg: dict[str, Any]) -> str:
 
 
 def _objective_transform(raw: dict[str, Any]) -> torch.Tensor:
-    """Convert {accuracy, inference_ms, param_count} -> all-maximize tensor.
-
-    BoTorch's qNEHVI assumes maximization. We multiply the two minimize
-    objectives by -1 and scale param_count to millions so the GP's standardize
-    transform sees roughly comparable magnitudes.
-    """
+    
     return torch.tensor(
         [
             float(raw["accuracy"]),
@@ -162,11 +128,7 @@ def _objective_transform(raw: dict[str, Any]) -> torch.Tensor:
 
 
 def _compute_ref_point(y: torch.Tensor) -> list[float]:
-    """Dynamic reference point in transformed (all-maximize) space.
-
-    A valid reference must be slightly worse than every observed point on
-    every objective. We subtract a small margin from the per-axis min.
-    """
+    
     margin = torch.tensor([0.02, 5.0, 0.5], dtype=torch.double)
     ref = y.min(dim=0).values - margin
     return ref.tolist()

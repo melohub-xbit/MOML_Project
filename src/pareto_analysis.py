@@ -1,19 +1,4 @@
-"""
-pareto_analysis.py -- Pareto-front quality metrics for MOML optimization results.
 
-Metrics implemented:
-    1) Hypervolume (3D) with mixed objective directions
-    2) Spacing metric (front diversity; lower is better)
-    3) Generational distance (front convergence; lower is better)
-
-Objective convention in this project:
-    - accuracy      : maximize
-    - inference_ms  : minimize
-    - param_count   : minimize
-
-Reference point from project description:
-    [accuracy=0.0, inference_ms=1000.0, param_count=10_000_000]
-"""
 
 from __future__ import annotations
 
@@ -35,7 +20,6 @@ DEFAULT_REFERENCE_POINT = (0.0, 1000.0, 10_000_000.0)
 
 
 def _load_objective_matrix(csv_path: str | Path) -> np.ndarray:
-    """Load objective columns from a CSV file into an (N, 3) float array."""
     path = Path(csv_path)
     if not path.exists():
         raise FileNotFoundError(f"CSV file not found: {path}")
@@ -66,11 +50,7 @@ def _load_objective_matrix(csv_path: str | Path) -> np.ndarray:
 
 
 def _to_minimization_space(points: np.ndarray) -> np.ndarray:
-    """Convert project mixed objectives to all-minimization space.
-
-    Input columns:  [accuracy, inference_ms, param_count]
-    Output columns: [1 - accuracy, inference_ms, param_count]
-    """
+    
     if points.ndim != 2 or points.shape[1] != 3:
         raise ValueError("Expected points with shape (N, 3)")
 
@@ -88,7 +68,6 @@ def _reference_to_minimization_space(reference_point: tuple[float, float, float]
 
 
 def _pareto_mask_min(points_min: np.ndarray) -> np.ndarray:
-    """Return boolean mask for non-dominated points in minimization space."""
     n = points_min.shape[0]
     mask = np.ones(n, dtype=bool)
 
@@ -107,10 +86,7 @@ def _pareto_mask_min(points_min: np.ndarray) -> np.ndarray:
 
 
 def pareto_front(points_mixed: np.ndarray) -> np.ndarray:
-    """Extract non-dominated points from mixed-objective points.
-
-    Returns points in original mixed-objective space.
-    """
+    
     points_min = _to_minimization_space(points_mixed)
     mask = _pareto_mask_min(points_min)
     return points_mixed[mask]
@@ -122,7 +98,6 @@ def pareto_front(points_mixed: np.ndarray) -> np.ndarray:
 
 
 def _hypervolume_2d_min(points_2d: np.ndarray, reference_2d: np.ndarray) -> float:
-    """Exact 2D hypervolume for minimization objectives."""
     if points_2d.size == 0:
         return 0.0
 
@@ -149,10 +124,7 @@ def _hypervolume_2d_min(points_2d: np.ndarray, reference_2d: np.ndarray) -> floa
 
 
 def hypervolume_3d(points_mixed: np.ndarray, reference_point: tuple[float, float, float]) -> float:
-    """Exact 3D hypervolume in project mixed-objective space.
-
-    Internally converted to minimization space.
-    """
+    
     points_min = _to_minimization_space(points_mixed)
     ref_min = _reference_to_minimization_space(reference_point)
 
@@ -194,10 +166,7 @@ def _minmax_normalize(points: np.ndarray, mins: np.ndarray, maxs: np.ndarray) ->
 
 
 def spacing_metric(points_mixed: np.ndarray) -> float:
-    """Spacing metric on non-dominated front in minimization-normalized space.
-
-    Lower is better (more uniformly spaced front).
-    """
+    
     if points_mixed.shape[0] < 2:
         return 0.0
 
@@ -227,10 +196,6 @@ def spacing_metric(points_mixed: np.ndarray) -> float:
 
 
 def generational_distance(approx_mixed: np.ndarray, reference_mixed: np.ndarray) -> float:
-    """Generational Distance (GD): lower is better.
-
-    Computed between non-dominated approximation front and a reference front.
-    """
     if approx_mixed.size == 0:
         raise ValueError("approx_mixed is empty")
     if reference_mixed.size == 0:
@@ -268,12 +233,7 @@ def evaluate_optuna_study_dir(
     reference_point: tuple[float, float, float] = DEFAULT_REFERENCE_POINT,
     save_json: bool = True,
 ) -> dict[str, Any]:
-    """Evaluate Pareto metrics for one Optuna study directory.
-
-    Requires:
-        - trials.csv
-        - pareto_front.csv
-    """
+    
     root = Path(study_dir)
     trials_csv = root / "trials.csv"
     pareto_csv = root / "pareto_front.csv"
@@ -310,10 +270,7 @@ def compare_two_fronts(
     approx_front_csv: str | Path,
     other_front_csv: str | Path,
 ) -> dict[str, float]:
-    """Compare two fronts using GD against their merged non-dominated reference.
-
-    This is useful for framework comparison (Optuna vs BoTorch).
-    """
+    
     approx = _load_objective_matrix(approx_front_csv)
     other = _load_objective_matrix(other_front_csv)
 

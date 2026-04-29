@@ -1,23 +1,4 @@
-"""
-data_loader.py — Data loading and preprocessing for CIFAR-10 and Fashion-MNIST.
 
-Provides unified data loading for the MOO optimization pipeline.
-Both datasets are loaded from local files in ./data/ (no internet required).
-
-CUDA-aware defaults:
-    - GPU available  → train_subset_size = 20,000 (GPU handles 2x data within budget)
-    - CPU only       → train_subset_size = 10,000 (keeps each MOO trial under ~2 min)
-
-Usage:
-    from data_loader import get_dataloaders, get_dataset_info, DEVICE
-
-    train_loader, test_loader = get_dataloaders(
-        dataset_name="cifar10",
-        batch_size=64,
-        # train_subset_size auto-selects 20K (GPU) or 10K (CPU) if not specified
-        seed=42,
-    )
-"""
 
 from pathlib import Path
 
@@ -68,12 +49,7 @@ DATASET_INFO = {
 
 
 def _build_cifar10_transforms(input_resolution: int = 32):
-    """Build train/test transforms for CIFAR-10.
-
-    Applies optional resizing (for the `input_resolution` search-space
-    variable), conversion to tensor, and per-channel normalization using
-    the CIFAR-10 channel means and standard deviations.
-    """
+    
     normalize = transforms.Normalize(
         mean=[0.4914, 0.4822, 0.4465],
         std=[0.2470, 0.2435, 0.2616],
@@ -92,11 +68,7 @@ def _build_cifar10_transforms(input_resolution: int = 32):
 
 
 def _build_fashion_mnist_transforms(input_resolution: int = 28):
-    """Build train/test transforms for Fashion-MNIST.
-
-    Similar to CIFAR-10 but single-channel grayscale.  Uses the
-    Fashion-MNIST global mean/std for normalization.
-    """
+    
     normalize = transforms.Normalize(mean=[0.2860], std=[0.3530])
 
     transform_list = []
@@ -115,10 +87,7 @@ def _build_fashion_mnist_transforms(input_resolution: int = 28):
 
 
 def get_dataset_info(dataset_name: str) -> dict:
-    """Return metadata dict for the given dataset.
-
-    Keys: num_classes, input_channels, default_resolution, class_names.
-    """
+    
     key = dataset_name.lower().replace("-", "_")
     if key not in DATASET_INFO:
         raise ValueError(
@@ -137,37 +106,6 @@ def get_dataloaders(
     seed: int = 42,
     num_workers: int = 2,
 ) -> tuple[DataLoader, DataLoader]:
-    """Create train and test DataLoaders for the specified dataset.
-
-    Parameters
-    ----------
-    dataset_name : str
-        One of ``"cifar10"`` or ``"fashion_mnist"``.
-    batch_size : int
-        Mini-batch size used during training.
-    train_subset_size : int, None, or "auto"
-        Number of training samples to use per trial.
-        - ``"auto"`` (default): 20,000 if CUDA GPU is available, else 10,000.
-          This keeps each MOO trial within a ~2 min budget.
-        - ``int``: use exactly this many samples.
-        - ``None``: use the full training set (50K CIFAR / 60K FashionMNIST).
-    test_subset_size : int or None
-        If set, use a fixed random subset of the test set (e.g. 500
-        samples for fast inference-time measurement). ``None`` means
-        use the full test set.
-    input_resolution : int or None
-        Target spatial resolution.  If ``None``, the dataset's native
-        resolution is used (32 for CIFAR-10, 28 for Fashion-MNIST).
-        Passing 16, for example, will down-sample images to 16×16.
-    seed : int
-        Random seed for reproducible subset selection.
-    num_workers : int
-        Number of background data-loading workers.
-
-    Returns
-    -------
-    train_loader, test_loader : tuple[DataLoader, DataLoader]
-    """
     key = dataset_name.lower().replace("-", "_")
     info = get_dataset_info(key)
 

@@ -1,36 +1,4 @@
-"""
-train_eval.py -- Training loop and 3-objective evaluation for MOO trials.
 
-Takes a hyperparameter configuration dict, builds the model, trains it,
-and returns the three objectives:
-    O1: Classification accuracy (maximize)
-    O2: Inference time in ms (minimize)
-    O3: Trainable parameter count (minimize)
-
-Inference time is ALWAYS measured on CPU with batch_size=1 per the project
-spec, ensuring fair hardware-independent comparison even when training on GPU.
-
-Usage:
-    from train_eval import train_and_evaluate
-
-    objectives = train_and_evaluate(
-        config={
-            "arch_type": "residual",
-            "num_conv_layers": 3,
-            "num_channels": 64,
-            "num_fc_units": 128,
-            "learning_rate": 1e-3,
-            "batch_size": 32,
-            "num_epochs": 10,
-            "dropout_rate": 0.2,
-            "optimizer_type": "Adam",
-            "input_resolution": 32,
-        },
-        dataset_name="cifar10",
-        seed=42,
-    )
-    # objectives = {"accuracy": 0.82, "inference_ms": 1.23, "param_count": 45312}
-"""
 
 import time
 import random
@@ -50,7 +18,6 @@ from models import build_model, count_parameters
 
 
 def _set_seed(seed: int):
-    """Set all random seeds for full reproducibility."""
     random.seed(seed)
     np.random.seed(seed)
     torch.manual_seed(seed)
@@ -69,7 +36,6 @@ def _build_optimizer(
     optimizer_type: str,
     learning_rate: float,
 ) -> torch.optim.Optimizer:
-    """Create optimizer from search-space config."""
     if optimizer_type == "Adam":
         return torch.optim.Adam(model.parameters(), lr=learning_rate)
     elif optimizer_type == "SGD":
@@ -86,12 +52,7 @@ def _train_model(
     show_progress: bool = True,
     use_amp: bool = False,
 ):
-    """Train the model in-place. No return value.
-
-    When ``use_amp`` is True and we are on CUDA, training uses fp16 autocast
-    + GradScaler. ~2x speedup on Ampere+ for these small CNNs, no accuracy
-    impact. On CPU or MPS the flag is ignored.
-    """
+    
     criterion = nn.CrossEntropyLoss()
     model.train()
 
@@ -139,7 +100,6 @@ def _evaluate_accuracy(
     test_loader: torch.utils.data.DataLoader,
     show_progress: bool = True,
 ) -> float:
-    """Compute top-1 accuracy on the test set. Returns float in [0, 1]."""
     model.eval()
     correct = 0
     total = 0
@@ -172,11 +132,7 @@ def _measure_inference_time(
     num_samples: int = 500,
     warmup: int = 50,
 ) -> float:
-    """Measure average inference time per sample in milliseconds.
-
-    Per project spec: measured on CPU, batch_size=1, torch.no_grad(),
-    using time.perf_counter(). Includes warmup passes that are discarded.
-    """
+    
     # Always measure on CPU for fair comparison
     cpu_model = model.cpu()
     cpu_model.eval()
@@ -220,41 +176,7 @@ def train_and_evaluate(
     inference_warmup: int = 50,
     inference_timed: int = 500,
 ) -> dict:
-    """Full MOO trial: build model, train, evaluate all 3 objectives.
-
-    Parameters
-    ----------
-    config : dict
-        Hyperparameter configuration with keys:
-            arch_type        : str   - "plain", "residual", "depthwise_separable"
-            num_conv_layers  : int   - [1, 4]
-            num_channels     : int   - [8, 128], powers of 2
-            num_fc_units     : int   - [32, 256]
-            learning_rate    : float - [1e-5, 1e-2]
-            batch_size       : int   - {16, 32, 64}
-            num_epochs       : int   - [5, 15]
-            dropout_rate     : float - [0.0, 0.5]
-            optimizer_type   : str   - "SGD" or "Adam"
-            input_resolution : int   - {16, 32}
-    dataset_name : str
-        "cifar10" or "fashion_mnist"
-    seed : int
-        Random seed for this trial. For MOO loops, use base_seed + trial_number.
-    train_subset_size : int or "auto"
-        Training subset size. "auto" = 20K (GPU) / 10K (CPU).
-    show_progress : bool
-        If True, show tqdm progress bars during train/eval loops.
-    num_workers : int
-        Number of DataLoader workers. Use 0 in notebooks on Windows to avoid
-        multiprocessing issues.
-
-    Returns
-    -------
-    dict with keys:
-        accuracy    : float - Top-1 test accuracy in [0, 1]
-        inference_ms: float - Avg ms per sample (CPU, batch=1)
-        param_count : int   - Total trainable parameters
-    """
+    
     _set_seed(seed)
 
     # ---- Get dataset metadata --------------------------------------------

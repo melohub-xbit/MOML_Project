@@ -1,18 +1,4 @@
-"""
-moo_pymoo.py -- pymoo NSGA-II multi-objective optimization for MOML project.
 
-3 objectives:
-    O1: Maximize accuracy
-    O2: Minimize inference_ms (CPU, batch=1)
-    O3: Minimize param_count
-
-pymoo internally minimizes everything; accuracy is fed in as -accuracy and
-restored on output.
-
-Each completed trial is appended to trials.csv immediately so a crash mid-run
-loses no work. The final population's non-dominated set is written to
-pareto_front.csv. Run analyze_pymoo.py afterwards for metrics and plots.
-"""
 
 from __future__ import annotations
 
@@ -58,21 +44,7 @@ SEARCH_SPACE_KEYS = [
 
 
 def make_search_space() -> dict:
-    """Mixed-variable search space, deliberately reduced.
-
-    Architecture decision variables are limited to conv-layer count and
-    conv-channel width. arch_type and num_fc_units are pinned to single
-    options so the only architectural levers NSGA-II pulls are the two
-    that directly drive the param/inference trade-off via the conv stack:
-
-      arch_type      : fixed to "plain"   (drop residual / depthwise_separable)
-      num_fc_units   : fixed to 128       (FC head not a search dim)
-
-    The remaining 7 dims are training/preprocessing hyperparameters
-    (learning rate, batch size, epochs, dropout, optimizer, resolution)
-    plus the two conv knobs above. Keeping per-trial time near 10-25s on a
-    small GPU lets the full study fit the 2-hour wall-clock cap.
-    """
+    
     return {
         "arch_type": Choice(options=["plain"]),
         "num_conv_layers": Choice(options=[1, 2, 4]),
@@ -88,11 +60,7 @@ def make_search_space() -> dict:
 
 
 def _normalize_cfg(raw: dict[str, Any], max_resolution: int) -> dict[str, Any]:
-    """Cast pymoo numpy types to plain Python and clamp resolution.
-
-    Resolution > dataset's native size would force upsampling, which the
-    transforms in data_loader don't apply -- clamp to the dataset's max.
-    """
+    
     cfg = {k: raw[k] for k in SEARCH_SPACE_KEYS}
     # PyTorch's BatchSampler rejects np.int64 (isinstance(int) check), so cast
     # every numeric field down to plain Python int / float.
@@ -105,7 +73,6 @@ def _normalize_cfg(raw: dict[str, Any], max_resolution: int) -> dict[str, Any]:
 
 
 class ImageClsProblem(ElementwiseProblem):
-    """One pymoo evaluation == one full train_and_evaluate trial."""
 
     def __init__(
         self,
@@ -198,7 +165,6 @@ class ImageClsProblem(ElementwiseProblem):
 
 
 class GenLogger(Callback):
-    """Print a one-line status at the end of each NSGA-II generation."""
 
     def __init__(self, total_gens: int, t0: float) -> None:
         super().__init__()
